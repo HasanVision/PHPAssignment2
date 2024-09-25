@@ -1,11 +1,20 @@
 <?php
 require('../model/database.php');
 
-
+// Get the search input if provided
+$last_name = filter_input(INPUT_POST, 'last_name', FILTER_SANITIZE_STRING);
 
 try {
-    $query = 'SELECT * FROM customers ORDER BY lastName';
-    $statement = $db->prepare($query);
+    // If last name is provided, search for it
+    if ($last_name) {
+        $query = 'SELECT * FROM customers WHERE lastName LIKE :last_name ORDER BY lastName';
+        $statement = $db->prepare($query);
+        $statement->bindValue(':last_name', '%' . $last_name . '%'); // Using LIKE for partial match
+    } else {
+        // If no search term, display all customers
+        $query = 'SELECT * FROM customers ORDER BY lastName';
+        $statement = $db->prepare($query);
+    }
     $statement->execute();
     $customers = $statement->fetchAll();
     $statement->closeCursor();
@@ -13,21 +22,7 @@ try {
     echo 'Database Error: ' . $e->getMessage();
     exit();
 }
-
-// $action = filter_input(INPUT_POST, 'action');
-// if ($action === NULL) {
-//     $action = filter_input(INPUT_GET, 'action');
-//     if ($action === NULL) {
-//         $action = 'under_construction';
-//     }
-// }
-
-// if ($action == 'under_construction') {
-//     include('../under_construction.php');
-// }
-
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -37,42 +32,48 @@ try {
         <link rel="stylesheet" type="text/css" href="/phpassignment2/tech_support/main.css">
     </head>
 <body>
-    <?php
-    include('../view/header.php');
-    ?>
+    <?php include('../view/header.php'); ?>
     <main>
     <h1>Customer Search</h1>
-    <form action="search_costomer.php" method="post">
-        <input type="hidden" name="action" value="search_customers">
+    <form action="." method="post">
         <label>Last Name:</label>
-        <input type="text" name="last_name">
+        <input type="text" name="last_name" value="<?php echo htmlspecialchars($last_name); ?>">
         <input type="submit" value="Search">
     </form>
+    <h2>Customer List</h2>
     <table border="1">
         <thead>
             <tr>
                 <th>Name</th>
                 <th>Email Address</th>
-                <th>city</th>
+                <th>City</th>
+                <th>Select</th>
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($customers as $customer) : ?>
-            <tr>
-                <td><?php echo htmlspecialchars($customer['firstName']); ?></td>
-                <td><?php echo htmlspecialchars($customer['lastName']); ?></td>
-                <td><?php echo htmlspecialchars($customer['city']); ?></td>
-                <td><form action="select_customer.php" method="post">
-                    <input type="hidden" name="customer_id" value="<?php echo htmlspecialchars($customer['customerID']); ?>">
-                    <input type="submit" value="Select">
-            </tr>
-            <?php endforeach; ?>
+            <?php if (!empty($customers)) : ?>
+                <?php foreach ($customers as $customer) : ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($customer['firstName'] . ' ' . $customer['lastName']); ?></td>
+                        <td><?php echo htmlspecialchars($customer['email']); ?></td>
+                        <td><?php echo htmlspecialchars($customer['city']); ?></td>
+                        <td>
+                            <form action="select_customer.php" method="post">
+                                <input type="hidden" name="customer_id" value="<?php echo htmlspecialchars($customer['customerID']); ?>">
+                                <input type="submit" value="Select">
+                            </form>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else : ?>
+                <tr>
+                    <td colspan="4">No customers found.</td>
+                </tr>
+            <?php endif; ?>
         </tbody>
     </table>
     <a href="/phpassignment2/tech_support/customer_manager/select_customer_form.php">Add product</a>
-    <?php
-    include('../view/footer.php');
-    ?>
-     </main>
+    <?php include('../view/footer.php'); ?>
+    </main>
 </body>
 </html>
