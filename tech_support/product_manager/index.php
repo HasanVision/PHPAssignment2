@@ -1,16 +1,75 @@
 <?php
 require('../model/database.php');
-// require('../model/product_db.php');
 
-$action = filter_input(INPUT_POST, 'action');
-if ($action === NULL) {
-    $action = filter_input(INPUT_GET, 'action');
-    if ($action === NULL) {
-        $action = 'under_construction';
-    }
+
+
+try {
+    $query = 'SELECT * FROM products';
+    $statement = $db->prepare($query);
+    $statement->execute();
+    $products = $statement->fetchAll();
+    $statement->closeCursor();
+} catch (PDOException $e) {
+    echo 'Database Error: ' . $e->getMessage();
+    exit();
 }
 
-if ($action == 'under_construction') {
-    include('../under_construction.php');
-}
+// $action = filter_input(INPUT_POST, 'action');
+// if ($action === NULL) {
+//     $action = filter_input(INPUT_GET, 'action');
+//     if ($action === NULL) {
+//         $action = 'under_construction';
+//     }
+// }
+
+// if ($action == 'under_construction') {
+//     include('../under_construction.php');
+// }
+
 ?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Product Manager</title>
+        <link rel="stylesheet" type="text/css" href="/phpassignment2/tech_support/main.css">
+    </head>
+<body>
+    <?php
+    include('../view/header.php');
+    ?>
+    <main>
+    <h1>Product List</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Product Code</th>
+                <th>Name</th>
+                <th>Version</th>
+                <th>Release Date</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($products as $product) : ?>
+            <tr>
+                <td><?php echo htmlspecialchars($product['productCode']); ?></td>
+                <td><?php echo htmlspecialchars($product['name']); ?></td>
+                <td><?php echo htmlspecialchars($product['version']); ?></td>
+                <td><?php echo htmlspecialchars($product['releaseDate']); ?></td>
+                <td><form action="delete_product.php" method="post">
+                    <input type="hidden" name="product_code" value="<?php echo htmlspecialchars($product['productCode']); ?>">
+                    <input type="submit" value="Delete">
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+    <a href="/phpassignment2/tech_support/product_manager/add_product_form.php">Add product</a>
+    <?php
+    include('../view/footer.php');
+    ?>
+     </main>
+</body>
+</html>
