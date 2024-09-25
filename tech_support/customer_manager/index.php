@@ -9,7 +9,7 @@ try {
     if ($last_name) {
         $query = 'SELECT * FROM customers WHERE lastName LIKE :last_name ORDER BY lastName';
         $statement = $db->prepare($query);
-        $statement->bindValue(':last_name', '%' . $last_name . '%'); // Using LIKE for partial match
+        $statement->bindValue(':last_name', '%' . $last_name . '%');
     } else {
         // If no search term, display all customers
         $query = 'SELECT * FROM customers ORDER BY lastName';
