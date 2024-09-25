@@ -58,9 +58,9 @@ try {
                         <td><?php echo htmlspecialchars($customer['email']); ?></td>
                         <td><?php echo htmlspecialchars($customer['city']); ?></td>
                         <td>
-                            <form action="select_customer.php" method="post">
+                            <form action="select_customer_form.php" method="post">
                                 <input type="hidden" name="customer_id" value="<?php echo htmlspecialchars($customer['customerID']); ?>">
-                                <input type="submit" value="Select">
+                                <input type="submit" value="Update">
                             </form>
                         </td>
                     </tr>
@@ -72,7 +72,6 @@ try {
             <?php endif; ?>
         </tbody>
     </table>
-    <a href="/phpassignment2/tech_support/customer_manager/select_customer_form.php">Add product</a>
     <?php include('../view/footer.php'); ?>
     </main>
 </body>
