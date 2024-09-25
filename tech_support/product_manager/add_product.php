@@ -28,7 +28,7 @@ if ($code == NULL || $name == NULL || $version == NULL || $release_date == NULL)
         $statement->closeCursor();
 
         // Redirect to confirmation page
-        $url = 'tech_support/product_manager/add_product_confirmation.php';
+        $url = 'add_product_confirmation.php';
         header("Location: " . $url);
         die();
         
