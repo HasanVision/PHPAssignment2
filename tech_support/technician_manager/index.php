@@ -42,7 +42,7 @@ try {
     ?>
     <main>
     <h1>Technicians List</h1>
-    <table border="1">
+    <table>
         <thead>
             <tr>
                 <th>Technician ID</th>
